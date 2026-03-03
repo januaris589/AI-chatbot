@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Januaris AI Chatbot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .chat-container {
+            width: 500px;
+            max-width: 90%;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0px 0px 15px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+            padding: 15px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        #chatbox {
+            flex: 1;
+            height: 400px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 10px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+            background-color: #f9f9f9;
+        }
+
+        .user, .bot {
+            margin: 5px 0;
+            display: flex;
+        }
+
+        .user span {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 15px;
+            display: inline-block;
+            max-width: 80%;
+            word-wrap: break-word;
+            margin-left: auto;
+        }
+
+        .bot span {
+            background-color: #e0e0e0;
+            padding: 10px 15px;
+            border-radius: 15px;
+            display: inline-block;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+
+        .typing {
+            font-style: italic;
+            color: green;
+            margin-bottom: 5px;
+        }
+
+        .input-area {
+            display: flex;
+        }
+
+        input {
+            flex: 1;
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            padding: 10px 15px;
+            margin-left: 5px;
+            border: none;
+            border-radius: 10px;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+<div class="chat-container">
+    <h2>Januaris AI Chatbot</h2>
+    <div id="chatbox"></div>
+    <div class="input-area">
+        <input type="text" id="userInput" placeholder="Type your message...">
+        <button onclick="reply()">Send</button>
+    </div>
+</div>
+
+<script>
+    const chatbox = document.getElementById("chatbox");
+    const userInput = document.getElementById("userInput");
+    const botName = "Januaris AI Chatbot";
+    const aioutput = document.getElementById("aioutput");
+
+    // Predefined Q&A
+    const answers = {
+        "hello": "Hello Januaris! 👋",
+        "hi": "Hi there! How can I help you?",
+        "how are you": "I am just code, but I am working perfectly!",
+        "what is your name": "I am Januaris AI Chatbot.",
+        "what can you do": "I can chat with you, answer simple questions, and learn over time!",
+        "bye": "Goodbye! See you next time.",
+        "thank you": "You're welcome! 😊",
+        "who made you": "You made me, of course!",
+        "help": "how can i help you 'hello', 'how are you', or 'what can you do'."
+    };
+
+    // Send on Enter
+    userInput.addEventListener("keydown", function(e) {
+        if(e.key === "Enter") reply();
+    });
+
+    // Get bot reply (offline)
+    function getBotReply(text) {
+        text = text.toLowerCase();
+        return answers[text] || "Sorry, I am still learning. Try typing hello.";
+    }
+
+    // Typing effect
+    function typeBotReply(text, element, i = 0) {
+        if (i < text.length) {
+            element.innerHTML += text.charAt(i);
+            i++;
+            setTimeout(() => typeBotReply(text, element, i), 30);
+        }
+    }
+
+    async function reply() {
+        const text = userInput.value.trim();
+        if(!text) return;
+
+        // User message
+        chatbox.innerHTML += `<div class='user'><span>${text}</span></div>`;
+        userInput.value = "";
+        chatbox.scrollTop = chatbox.scrollHeight;
+
+        // Typing indicator
+        const typingIndicator = document.createElement("div");
+        typingIndicator.className = "typing";
+        typingIndicator.innerText = "Bot is typing...";
+        chatbox.appendChild(typingIndicator);
+        chatbox.scrollTop = chatbox.scrollHeight;
+
+        // Simulate delay
+        await new Promise(r => setTimeout(r, 800));
+
+        // --------------------------
+        // Uncomment below to connect to real AI backend
+        // const response = await fetch("http://localhost:3000/chat", {
+        //     method: "POST",
+        //     headers: { "Content-Type": "application/json" },
+        //     body: JSON.stringify({ prompt: text })
+        // });
+        // const data = await response.json();
+        // const botReply = data.reply;
+        // --------------------------
+
+        // Offline reply
+        const botReply = getBotReply(text);
+
+        // Remove typing
+        typingIndicator.remove();
+
+        // Bot message
+        const botDiv = document.createElement("div");
+        botDiv.className = "bot";
+        const botSpan = document.createElement("span");
+        botDiv.appendChild(botSpan);
+        chatbox.appendChild(botDiv);
+        chatbox.scrollTop = chatbox.scrollHeight;
+
+        // Type bot reply
+        typeBotReply(botReply, botSpan);
+    }
+</script>
+</body>
+</html>
